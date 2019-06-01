@@ -18,7 +18,6 @@ public class ItemDetailFragment extends Fragment {
 
     int itemId;
     TextView nameTextView, restaurantTextView, typeTextView;
-    ListView reviewsListView;
 
     public ItemDetailFragment() {
         // Required empty public constructor
@@ -34,21 +33,23 @@ public class ItemDetailFragment extends Fragment {
         nameTextView = view.findViewById(R.id.itemNameTextViewId);
         restaurantTextView = view.findViewById(R.id.itemRestaurantTextViewId);
         typeTextView = view.findViewById(R.id.itemTypeTextViewId);
-//        reviewsListView = view.findViewById(R.id.itemReviewTextViewId);
 
-        int itemId = (int)getArguments().getInt("itemid");
+        if (getArguments() != null) {
+            int itemId = (int)getArguments().getInt("itemid");
+        }
+
         Log.d("itemid", " " + itemId);
         setItem(itemId);
 
-//        RecyclerView restaurantsItemsListRecyclerView = (RecyclerView)
-//                (view.findViewById(R.id.itemsReviewslist_recyclerview));
-//
-//        RestaurantItemsListAdapter restaurantItemsListAdapter = new RestaurantItemsListAdapter(Item.items);
-//        restaurantsItemsListRecyclerView.setAdapter(restaurantItemsListAdapter);
-//        restaurantItemsListAdapter.setListener((RestaurantItemsListAdapter.Listener)getActivity());
-//
-//        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-//        restaurantsItemsListRecyclerView.setLayoutManager(mLayoutManager);
+        RecyclerView itemReviewsListRecyclerView = (RecyclerView)
+                (view.findViewById(R.id.itemreviewlist_recyclerview));
+
+        ItemReviewsAdapter itemReviewsAdapter = new ItemReviewsAdapter(Review.reviews);
+        itemReviewsListRecyclerView.setAdapter(itemReviewsAdapter);
+        itemReviewsAdapter.setListener((ItemReviewsAdapter.Listener)getActivity());
+
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        itemReviewsListRecyclerView.setLayoutManager(mLayoutManager);
 
         return view;
     }
@@ -56,6 +57,8 @@ public class ItemDetailFragment extends Fragment {
     public void setItem(int itId) {
         itemId = itId;
         nameTextView.setText(Item.items.get(itemId).getName());
+        restaurantTextView.setText("Restaurant: " + Item.items.get(itemId).getRestaurant());
+        typeTextView.setText("Type: " + Item.items.get(itemId).getType());
     }
 
     public int getItemId(){

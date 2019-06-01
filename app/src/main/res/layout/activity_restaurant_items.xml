@@ -8,7 +8,7 @@
     tools:context="com.luisramirez.sugafoodi.RestaurantItemsDetailActivity">
 
     <fragment
-        android:id="@+id/detailfragment"
+        android:id="@+id/itemdetailfragment"
         android:name="com.luisramirez.sugafoodi.RestaurantItemsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

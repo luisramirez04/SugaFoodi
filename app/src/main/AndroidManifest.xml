@@ -20,6 +20,7 @@
         <activity android:name=".RestaurantItemsDetailActivity" />
         <activity android:name=".AddItemActivity"/>
         <activity android:name=".ItemDetailActivity" />
+        <activity android:name=".AddReviewActivity" />
     </application>
 
 </manifest>
