@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SugaFoodi</string>
+
+    <string-array name="Restaurants_list">
+        <item>Red Lobster</item>
+        <item>Ruby Tuesdays</item>
+        <item>Red Robin</item>
+    </string-array>
+</resources>
