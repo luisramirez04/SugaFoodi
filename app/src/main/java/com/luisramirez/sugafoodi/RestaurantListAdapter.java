@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.sip.SipSession;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
     private Listener listener;
 
     interface Listener {
-        abstract void onClick(int position);
+        abstract void onClick(String id, int position);
     }
 
     public RestaurantListAdapter(List<Restaurant> restaurants){this.restaurants = restaurants;}
@@ -38,7 +39,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
             public void onClick(View view) {
                 listener = (Listener)view.getContext();
                 if (listener != null)
-                    listener.onClick(position);
+                    listener.onClick(restaurants.get(position).getId(), position);
             }
         });
     }

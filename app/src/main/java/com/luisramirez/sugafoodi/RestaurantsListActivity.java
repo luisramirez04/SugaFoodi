@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 public class RestaurantsListActivity extends AppCompatActivity implements RestaurantListAdapter.Listener {
@@ -24,15 +25,16 @@ public class RestaurantsListActivity extends AppCompatActivity implements Restau
     }
 
     @Override
-    public void onClick(int position) {
+    public void onClick(String id, int position) {
         RestaurantItemsFragment detailFragment =
                 (RestaurantItemsFragment) getSupportFragmentManager().findFragmentById(R.id.detailfragment);
 
         if (detailFragment != null) {
-            detailFragment.setRestaurant(position);
+            detailFragment.setRestaurant(id);
         } else {
             Intent intent = new Intent(this, RestaurantItemsDetailActivity.class);
-            intent.putExtra("restaurantid", position);
+            intent.putExtra("RestaurantId", id);
+            intent.putExtra("Restaurantposition", position);
             startActivity(intent);
 
         }

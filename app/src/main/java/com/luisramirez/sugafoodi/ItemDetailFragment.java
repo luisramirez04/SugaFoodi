@@ -8,15 +8,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDetailFragment extends Fragment {
 
-    int itemId;
+    String itemId, itemName, restaurantName;
     TextView nameTextView, restaurantTextView, typeTextView;
 
     public ItemDetailFragment() {
@@ -35,33 +39,75 @@ public class ItemDetailFragment extends Fragment {
         typeTextView = view.findViewById(R.id.itemTypeTextViewId);
 
         if (getArguments() != null) {
-            int itemId = (int)getArguments().getInt("itemid");
+            itemId = getArguments().getString("itemid");
         }
 
-        Log.d("itemid", " " + itemId);
         setItem(itemId);
+
+        // Access a Cloud Firestore instance from your Activity
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+
+        Log.d("id", " " + itemId);
+
+        final List<Review> reviews = new ArrayList<>();
 
         RecyclerView itemReviewsListRecyclerView = (RecyclerView)
                 (view.findViewById(R.id.itemreviewlist_recyclerview));
 
-        ItemReviewsAdapter itemReviewsAdapter = new ItemReviewsAdapter(Review.reviews);
+        final ItemReviewsAdapter itemReviewsAdapter = new ItemReviewsAdapter(reviews);
         itemReviewsListRecyclerView.setAdapter(itemReviewsAdapter);
         itemReviewsAdapter.setListener((ItemReviewsAdapter.Listener)getActivity());
 
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         itemReviewsListRecyclerView.setLayoutManager(mLayoutManager);
 
+        DocumentReference docRef = db.collection("items").document(itemId);
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                List<String> reviewIds = (List)documentSnapshot.get("reviews");
+                if (reviewIds != null) {
+                    for (String id : reviewIds)
+                        db.collection("reviews").document(id)
+                                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Review review = documentSnapshot.toObject(Review.class);
+                                reviews.add(review);
+                                itemReviewsAdapter.notifyDataSetChanged();
+                            }
+                        });
+                }
+            }
+        });
+
         return view;
     }
 
-    public void setItem(int itId) {
+    public void setItem(String itId) {
         itemId = itId;
-        nameTextView.setText(Item.items.get(itemId).getName());
-        restaurantTextView.setText("Restaurant: " + Item.items.get(itemId).getRestaurant());
-        typeTextView.setText("Type: " + Item.items.get(itemId).getType());
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("items").document(itemId)
+                .get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                nameTextView.setText(String.valueOf(documentSnapshot.get("name")));
+                itemName = String.valueOf(documentSnapshot.get("name"));
+                restaurantTextView.setText("Restaurant: " + String.valueOf(documentSnapshot.get("restaurant")));
+                restaurantName = String.valueOf(documentSnapshot.get("restaurant"));
+                typeTextView.setText("Type: " + String.valueOf(documentSnapshot.get("type")));
+            }
+        });
     }
 
-    public int getItemId(){
+    public String getItemId(){
         return itemId;
     }
+
+    public String getItemName() { return itemName; }
+
+    public String getRestaurantName() { return restaurantName; }
+
 }

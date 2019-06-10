@@ -19,7 +19,7 @@ public class ItemReviewsAdapter extends RecyclerView.Adapter<ItemReviewsAdapter.
     private Listener listener;
 
     interface Listener {
-        abstract void onClick(int position);
+        abstract void onClick(String id, int position);
     }
 
     public ItemReviewsAdapter(List<Review> reviews){ this.reviews = reviews;}
@@ -41,7 +41,8 @@ public class ItemReviewsAdapter extends RecyclerView.Adapter<ItemReviewsAdapter.
             public void onClick(View view) {
                 listener = (Listener)view.getContext();
                 if (listener != null)
-                    listener.onClick(position);
+                    listener.onClick(reviews.get(position).getId(),
+                            position);
             }
         });
     }

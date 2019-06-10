@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "694750174451",
+    "firebase_url": "https://sugafoodi.firebaseio.com",
+    "project_id": "sugafoodi",
+    "storage_bucket": "sugafoodi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:694750174451:android:857b3c50f28f0909",
+        "android_client_info": {
+          "package_name": "com.luisramirez.sugafoodi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "694750174451-r2ab9oli592b7jjqfg6ptmcmpsbo8mpr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCANYo7OmaPVBry9PR9Hv6YK4hZNHd1Sa4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "694750174451-r2ab9oli592b7jjqfg6ptmcmpsbo8mpr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

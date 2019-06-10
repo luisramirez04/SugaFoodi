@@ -2,14 +2,28 @@ package com.luisramirez.sugafoodi;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+
 public class AddItemActivity extends AppCompatActivity {
+
+    private final String TAG = "LOG:";
+
+    FirebaseFirestore db;
 
     EditText nameEditText, restaurantEditText;
     RadioGroup typeRadioGroup;
@@ -20,6 +34,8 @@ public class AddItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_item);
 
+        // Access a Cloud Firestore instance from your Activity
+        db = FirebaseFirestore.getInstance();
 
         Button submitButton = (Button) findViewById(R.id.buttonSubmit);
         submitButton.setOnClickListener(new View.OnClickListener() {
@@ -36,8 +52,8 @@ public class AddItemActivity extends AppCompatActivity {
         typeRadioGroup = findViewById(R.id.radioGroupType);
         type = "";
 
-        String itemName = nameEditText.getText().toString();
-        String restaurantName = restaurantEditText.getText().toString();
+        final String itemName = nameEditText.getText().toString();
+        final String restaurantName = restaurantEditText.getText().toString();
 
         switch (typeRadioGroup.getCheckedRadioButtonId()) {
             case R.id.radioButtonFood:
@@ -51,13 +67,51 @@ public class AddItemActivity extends AppCompatActivity {
                 break;
             default: break;
         }
+        // Create a new item
 
-        Item newItem = new Item(itemName, restaurantName, type);
+
+        final DocumentReference newItemRef = db.collection("items").document();
+        Item item = new Item(newItemRef.getId(), itemName, restaurantName, type);
+
+        // Add a new document with a generated ID
+        newItemRef.set(item);
+
+        db.collection("restaurants")
+                .whereEqualTo("name", restaurantName)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, task.getResult().toString());
+                            QuerySnapshot documentSnapshot = task.getResult();
+                            if (documentSnapshot.isEmpty()) {
+
+                                DocumentReference newRestaurantRef = db.collection("restaurants").document();
+                                Restaurant restaurant = new Restaurant(newRestaurantRef.getId(), restaurantName, newItemRef.getId());
+
+                                // Add a new document with a generated ID
+                                newRestaurantRef.set(restaurant);
+                            } else {
+                                for(QueryDocumentSnapshot doc : task.getResult()) {
+                                    db.collection("restaurants").document(doc.getId())
+                                            .update("items", FieldValue.arrayUnion((newItemRef.getId())));
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+
 
         Intent intent = new Intent(this, RestaurantsListActivity.class);
         startActivity(intent);
     }
 
-
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

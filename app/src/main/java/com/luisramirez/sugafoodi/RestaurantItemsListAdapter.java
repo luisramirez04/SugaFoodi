@@ -18,7 +18,7 @@ public class RestaurantItemsListAdapter extends RecyclerView.Adapter<RestaurantI
     private Listener listener;
 
     interface Listener {
-        abstract void onClick(int position);
+        abstract void onClick(String id, int position);
     }
 
     public RestaurantItemsListAdapter(List<Item> items){ this.items = items;}
@@ -39,7 +39,7 @@ public class RestaurantItemsListAdapter extends RecyclerView.Adapter<RestaurantI
             public void onClick(View view) {
                 listener = (Listener)view.getContext();
                 if (listener != null)
-                    listener.onClick(position);
+                    listener.onClick(items.get(position).getId(), position);
             }
         });
     }

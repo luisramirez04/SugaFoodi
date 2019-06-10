@@ -5,9 +5,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.util.Log;
 
 public class RestaurantItemsDetailActivity extends AppCompatActivity implements RestaurantItemsListAdapter.Listener {
+
     RestaurantItemsFragment restaurantsItemsFragment;
 
     @Override
@@ -24,20 +25,26 @@ public class RestaurantItemsDetailActivity extends AppCompatActivity implements 
         // get the reference to the FragmentTransaction object
         FragmentTransaction transaction = fragManager.beginTransaction();
         // add the fragment into the transaction
-        transaction.add(R.id.restitemfragframe, restaurantsItemsFragment);
+        transaction.add(R.id.restDetailfragContainer, restaurantsItemsFragment);
         // commit the transaction.
         transaction.commit();
     }
 
     @Override
-    public void onClick(int position) {
-        ItemDetailFragment itemDetailFragment = (ItemDetailFragment) getSupportFragmentManager().findFragmentById(R.id.itemDetailfragContainer);
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onClick(String id, int position) {
+        ItemDetailFragment itemDetailFragment = (ItemDetailFragment) getSupportFragmentManager().findFragmentById(R.id.detailfragment);
 
         if (itemDetailFragment != null) {
-            itemDetailFragment.setItem(position);
+            itemDetailFragment.setItem(id);
         } else {
             Intent intent = new Intent(this, ItemDetailActivity.class);
-            intent.putExtra("itemid", position);
+            intent.putExtra("itemid", id);
+            intent.putExtra("itemPosition", position);
             startActivity(intent);
 
         }

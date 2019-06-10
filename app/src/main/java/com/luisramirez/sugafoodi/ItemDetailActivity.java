@@ -35,22 +35,23 @@ public class ItemDetailActivity extends AppCompatActivity implements ItemReviews
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), AddReviewActivity.class);
                 intent.putExtra("itemid", itemDetailFragment.getItemId());
+                intent.putExtra("itemname", itemDetailFragment.getItemName());
+                intent.putExtra("itemrestaurant", itemDetailFragment.getRestaurantName());
                 startActivity(intent);
             }
         });
     }
 
     @Override
-    public void onClick(int position) {
-//        RestaurantItemsFragment detailFragment = (RestaurantItemsFragment) getSupportFragmentManager().findFragmentById(R.id.detailfragment);
-//
-//        if (detailFragment != null) {
-//            detailFragment.setRestaurant(position);
-//        } else {
-//            Intent intent = new Intent(this, RestaurantItemsDetailActivity.class);
-//            intent.putExtra("restaurantid", position);
-//            startActivity(intent);
-//
-//        }
+    public void onClick(String id, int position) {
+        RestaurantItemsFragment detailFragment = (RestaurantItemsFragment) getSupportFragmentManager().findFragmentById(R.id.detailfragment);
+
+        if (detailFragment != null) {
+            detailFragment.setRestaurant(id);
+        } else {
+            Intent intent = new Intent(this, RestaurantItemsDetailActivity.class);
+            intent.putExtra("restaurantid", id);
+            startActivity(intent);
+        }
     }
 }
