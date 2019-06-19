@@ -1,60 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/addItemButton"
+    android:layout_height="match_parent">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Item" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/editTextItemName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Item Name" />
-
-    <EditText
-        android:id="@+id/editTextRestaurantName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Restaurant Name"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Type"/>
-
-    <RadioGroup
-        android:id="@+id/radioGroupType"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <RadioButton
-            android:id="@+id/radioButtonFood"
+        <TextView
+            android:id="@+id/addItemButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Food"/>
+            android:text="Add Item" />
 
-        <RadioButton
-            android:id="@+id/radioButtonDrink"
+        <EditText
+            android:id="@+id/editTextItemName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Drink"/>
+            android:hint="Item Name" />
 
-        <RadioButton
-            android:id="@+id/radioButtonDessert"
+        <EditText
+            android:id="@+id/editTextRestaurantName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dessert"/>
-    </RadioGroup>
+            android:hint="Restaurant Name"/>
 
-    <Button
-        android:id="@+id/buttonSubmit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Submit"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Type"/>
 
-</LinearLayout>
+        <RadioGroup
+            android:id="@+id/radioGroupType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/radioButtonFood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Food"/>
+
+            <RadioButton
+                android:id="@+id/radioButtonDrink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Drink"/>
+
+            <RadioButton
+                android:id="@+id/radioButtonDessert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dessert"/>
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/buttonAttach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Attach Image" />
+
+        <ImageView
+            android:id="@+id/foodImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/buttonSubmit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit"/>
+
+    </LinearLayout>
+</ScrollView>

@@ -8,12 +8,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +25,7 @@ public class ItemDetailFragment extends Fragment {
 
     String itemId, itemName, restaurantName;
     TextView nameTextView, restaurantTextView, typeTextView;
+    ImageView foodDetailImage;
 
     public ItemDetailFragment() {
         // Required empty public constructor
@@ -37,6 +41,7 @@ public class ItemDetailFragment extends Fragment {
         nameTextView = view.findViewById(R.id.itemNameTextViewId);
         restaurantTextView = view.findViewById(R.id.itemRestaurantTextViewId);
         typeTextView = view.findViewById(R.id.itemTypeTextViewId);
+        foodDetailImage = view.findViewById(R.id.foodDetailImage);
 
         if (getArguments() != null) {
             itemId = getArguments().getString("itemid");
@@ -100,6 +105,13 @@ public class ItemDetailFragment extends Fragment {
                 typeTextView.setText("Type: " + String.valueOf(documentSnapshot.get("type")));
             }
         });
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("images/" + itemId);
+        GlideApp.with(getContext())
+                .load(storageRef)
+                .into(foodDetailImage);
+
     }
 
     public String getItemId(){
@@ -110,4 +122,8 @@ public class ItemDetailFragment extends Fragment {
 
     public String getRestaurantName() { return restaurantName; }
 
+
+
 }
+
+

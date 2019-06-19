@@ -1,36 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.luisramirez.sugafoodi.ItemDetailFragment">
+    android:layout_height="match_parent" >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/itemNameTextViewId"
-        android:text="Item Name"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/itemRestaurantTextViewId"
-        android:text="Item Restaurant" />
-
-    <TextView
-        android:id="@+id/itemTypeTextViewId"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Item Type"/>
-
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/itemreviewlist_recyclerview"
-        android:scrollbars="vertical"/>
+        android:orientation="vertical"
+        tools:context="com.luisramirez.sugafoodi.ItemDetailFragment">
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/itemNameTextViewId"
+            android:text="Item Name"
+            android:textAlignment="center"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/foodDetailImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/itemRestaurantTextViewId"
+            android:text="Item Restaurant" />
+
+        <TextView
+            android:id="@+id/itemTypeTextViewId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Item Type"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/itemreviewlist_recyclerview"
+            android:scrollbars="vertical"/>
+
+    </LinearLayout>
+</ScrollView>

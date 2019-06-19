@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.luisramirez.sugafoodi">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,7 +22,7 @@
         </activity>
 
         <activity android:name=".RestaurantItemsDetailActivity" />
-        <activity android:name=".AddItemActivity"/>
+        <activity android:name=".AddItemActivity" />
         <activity android:name=".ItemDetailActivity" />
         <activity android:name=".AddReviewActivity" />
     </application>
