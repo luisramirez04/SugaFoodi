@@ -47,6 +47,7 @@ public class ItemDetailFragment extends Fragment {
             itemId = getArguments().getString("itemid");
         }
 
+
         setItem(itemId);
 
         // Access a Cloud Firestore instance from your Activity

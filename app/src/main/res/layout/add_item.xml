@@ -11,6 +11,8 @@
             android:id="@+id/addItemButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:textStyle="bold"
             android:text="Add Item" />
 
         <EditText
@@ -24,6 +26,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Restaurant Name"/>
+
+        <EditText
+            android:id="@+id/editTextAddRestaurantLocation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Restaurant Location"/>
 
         <TextView
             android:layout_width="match_parent"

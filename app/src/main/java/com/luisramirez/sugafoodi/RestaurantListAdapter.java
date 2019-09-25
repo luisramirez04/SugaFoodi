@@ -1,7 +1,5 @@
 package com.luisramirez.sugafoodi;
 
-import android.content.Intent;
-import android.net.sip.SipSession;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAdapter.RestaurantListViewHolder>{
@@ -33,6 +30,7 @@ public class RestaurantListAdapter extends RecyclerView.Adapter<RestaurantListAd
 
     @Override
     public void onBindViewHolder(RestaurantListViewHolder viewHolder, final int position){
+        Log.d("Restaurants", restaurants.get(position).toString());
         viewHolder.restTitleView.setText(restaurants.get(position).getTitle());
         viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override

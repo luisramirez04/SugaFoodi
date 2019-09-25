@@ -3,7 +3,6 @@ package com.luisramirez.sugafoodi;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,8 +11,6 @@ import android.widget.RatingBar;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Arrays;
 
 
 public class AddReviewActivity extends AppCompatActivity {
@@ -71,6 +68,7 @@ public class AddReviewActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ItemDetailActivity.class);
         intent.putExtra("itemid", itemId);
         startActivity(intent);
+        finish();
     }
 
 

@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,6 +44,8 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 
 public class AddItemActivity extends AppCompatActivity {
@@ -49,18 +53,24 @@ public class AddItemActivity extends AppCompatActivity {
     private final String TAG = "LOG:";
     public static final int PICK_IMAGE = 1;
 
-    FirebaseFirestore db;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseStorage storage;
     StorageReference storageReference;
-    private DatabaseReference mDatabase;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
-    EditText nameEditText, restaurantEditText;
+    EditText nameEditText, restaurantEditText, locationEditText;
     RadioGroup typeRadioGroup;
     String type;
     Button submitButton, attachImageButton;
     ImageView foodImage;
     private Uri filePath;
+
+    private final DocumentReference newRestaurantRef = db.collection("restaurants").document();
+    private DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("restaurantLocations");
+    private final GeoFire geoFire = new GeoFire(mDatabase);
+
+
+    final DocumentReference newItemRef = db.collection("items").document();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +78,7 @@ public class AddItemActivity extends AppCompatActivity {
         setContentView(R.layout.add_item);
 
         // Access a Cloud Firestore instance from your Activity
-        db = FirebaseFirestore.getInstance();
+
 
         foodImage = findViewById(R.id.foodImage);
 
@@ -87,6 +97,31 @@ public class AddItemActivity extends AppCompatActivity {
                 onClickAttach(v);
             }
         });
+
+        locationEditText = (EditText) findViewById(R.id.editTextAddRestaurantLocation);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+
+
+        } else {
+            fusedLocationProviderClient.getLastLocation()
+                    .addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                            List<Address> addresses;
+                            try {
+                                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                locationEditText.setText(addresses.get(0).getPostalCode());
+                            } catch (Exception e) {
+                                Log.d("Exception", e.toString());
+                            }
+                        }
+                    });
+        }
 
     }
 
@@ -140,37 +175,29 @@ public class AddItemActivity extends AppCompatActivity {
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
+
         // Create a new item
-
-        mDatabase = FirebaseDatabase.getInstance().getReference("restaurantLocations");
-        final GeoFire geoFire = new GeoFire(mDatabase);
-
-
-        final DocumentReference newItemRef = db.collection("items").document();
         Item item = new Item(newItemRef.getId(), itemName, restaurantName, type);
-
-        final DocumentReference newRestaurantRef = db.collection("restaurants").document();
 
         // Add a new document with a generated ID
         newItemRef.set(item);
 
         db.collection("restaurants")
-                .whereEqualTo("name", restaurantName)
+                .whereEqualTo("title", restaurantName)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, task.getResult().toString());
                             QuerySnapshot documentSnapshot = task.getResult();
                             if (documentSnapshot.isEmpty()) {
-                                Log.d("Rest Exists", "false");
-
+                                Log.d(TAG, "Adding new restaurant");
                                 Restaurant restaurant = new Restaurant(newRestaurantRef.getId(), restaurantName, newItemRef.getId());
 
                                 // Add a new document with a generated ID
                                 newRestaurantRef.set(restaurant);
                             } else {
+                                Log.d(TAG, "Updating restaurant");
                                 for(QueryDocumentSnapshot doc : task.getResult()) {
                                     db.collection("restaurants").document(doc.getId())
                                             .update("items", FieldValue.arrayUnion((newItemRef.getId())));
@@ -214,35 +241,70 @@ public class AddItemActivity extends AppCompatActivity {
                     });
     }
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+        uploadLocation(newRestaurantRef, geoFire);
 
 
-        } else {
-            fusedLocationProviderClient.getLastLocation()
-                    .addOnSuccessListener(new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if (location != null) {
-                                geoFire.setLocation(newRestaurantRef.getId(), new GeoLocation(location.getLatitude(), location.getLongitude()), new GeoFire.CompletionListener() {
+        Intent intent = new Intent(this, RestaurantsListActivity.class);
+        startActivity(intent);
+
+    }
+
+    public void uploadLocation(final DocumentReference ref, final GeoFire geoFire) {
+        Geocoder geocoder = new Geocoder(this);
+        final String zipText = locationEditText.getText().toString();
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(zipText, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                geoFire.setLocation(newRestaurantRef.getId(), new GeoLocation(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()), new GeoFire.CompletionListener() {
+                    @Override
+                    public void onComplete(String key, DatabaseError error) {
+                        if (error == null) {
+                            Log.d("LocationDB: ", "Good");
+                        } else {
+                            Log.d("LocationDB: ", "Error");
+                        }
+                    }
+                });
+            }
+
+        } catch(IOException e) {
+
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        fusedLocationProviderClient.getLastLocation()
+                                .addOnSuccessListener(new OnSuccessListener<Location>() {
                                     @Override
-                                    public void onComplete(String key, DatabaseError error) {
-                                        if (error == null) {
-                                            Log.d("LocationDB: ", "Good");
-                                        } else {
-                                            Log.d("LocationDB: ", "Error");
+                                    public void onSuccess(Location location) {
+                                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                                        List<Address> addresses;
+                                        try {
+                                            addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                            locationEditText.setText(addresses.get(0).getPostalCode());
+                                        } catch (Exception e) {
+                                            Log.d("Exception", e.toString());
                                         }
                                     }
                                 });
-                            }
-                        }
-                    });
-        }
+                    } catch (SecurityException e) {
+                        Log.d(TAG, "Security Exception");
+                    }
+                } else {
 
-//        Intent intent = new Intent(this, RestaurantsListActivity.class);
-//        startActivity(intent);
+
+                }
+                return;
+            }
+
+        }
     }
 
     @Override

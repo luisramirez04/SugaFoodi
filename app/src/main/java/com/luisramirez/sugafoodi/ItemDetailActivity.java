@@ -48,10 +48,7 @@ public class ItemDetailActivity extends AppCompatActivity implements ItemReviews
 
         if (detailFragment != null) {
             detailFragment.setRestaurant(id);
-        } else {
-            Intent intent = new Intent(this, RestaurantItemsDetailActivity.class);
-            intent.putExtra("restaurantid", id);
-            startActivity(intent);
         }
     }
+
 }

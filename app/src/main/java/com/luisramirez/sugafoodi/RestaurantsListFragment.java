@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.firebase.geofire.GeoFire;
@@ -45,6 +46,7 @@ public class RestaurantsListFragment extends Fragment {
     final RestaurantListAdapter restaurantListAdapter = new RestaurantListAdapter(restaurants);
     private FusedLocationProviderClient fusedLocationProviderClient;
     EditText userLocationEditText;
+    Button searchButton;
 
     public RestaurantsListFragment() {
         // Required empty public constructor
@@ -59,6 +61,14 @@ public class RestaurantsListFragment extends Fragment {
                 (v.findViewById(R.id.restaurantslist_recyclerview));
         userLocationEditText = (EditText) v.findViewById(R.id.userLocation);
 
+        searchButton = (Button) v.findViewById(R.id.searchButton);
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onClickSearch(view);
+            }
+        });
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
@@ -66,6 +76,30 @@ public class RestaurantsListFragment extends Fragment {
 
 
         } else {
+            getRestaurantsPermissionGranted();
+        }
+
+        restaurantsListRecyclerView.setAdapter(restaurantListAdapter);
+        restaurantListAdapter.setListener((RestaurantListAdapter.Listener)getActivity());
+
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
+        restaurantsListRecyclerView.setLayoutManager(mLayoutManager);
+
+        return v;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                getRestaurantsPermissionGranted();
+            }
+
+        }
+    }
+
+    public void getRestaurantsPermissionGranted() {
+        try {
             fusedLocationProviderClient.getLastLocation()
                     .addOnSuccessListener(new OnSuccessListener<Location>() {
                         @Override
@@ -112,7 +146,6 @@ public class RestaurantsListFragment extends Fragment {
 
                                         @Override
                                         public void onGeoQueryReady() {
-
                                         }
 
                                         @Override
@@ -126,23 +159,80 @@ public class RestaurantsListFragment extends Fragment {
                                 }
 
                             }
+
                         }
                     });
+        } catch (SecurityException e) {
+            Log.d("Exception", "Security Exception");
         }
-
-        restaurantsListRecyclerView.setAdapter(restaurantListAdapter);
-        restaurantListAdapter.setListener((RestaurantListAdapter.Listener)getActivity());
-
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        restaurantsListRecyclerView.setLayoutManager(mLayoutManager);
-
-        return v;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         restaurantListAdapter.notifyDataSetChanged();
+    }
+
+    public void onClickSearch(View v) {
+        restaurants.clear();
+        restaurantListAdapter.notifyDataSetChanged();
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        List<Address> addresses;
+        String locationEntered = userLocationEditText.getText().toString();
+
+        try {
+            addresses = geocoder.getFromLocationName(locationEntered, 1);
+            userLocationEditText.setText(addresses.get(0).getPostalCode());
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("restaurantLocations");
+            GeoFire geoFire = new GeoFire(ref);
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(addresses.get(0).getLatitude(), addresses.get(0).getLongitude()), 20);
+            geoQuery.addGeoQueryDataEventListener(new GeoQueryDataEventListener() {
+                @Override
+                public void onDataEntered(DataSnapshot dataSnapshot, GeoLocation location) {
+                    String restid = dataSnapshot.getKey();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    DocumentReference restaurantsRef = db.collection("restaurants").document(restid);
+                    Log.d(TAG, restaurantsRef.toString());
+                    if (restaurantsRef != null) {
+                        restaurantsRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Restaurant restaurant = documentSnapshot.toObject(Restaurant.class);
+                                restaurants.add(restaurant);
+                                restaurantListAdapter.notifyDataSetChanged();
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onDataExited(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onDataMoved(DataSnapshot dataSnapshot, GeoLocation location) {
+
+                }
+
+                @Override
+                public void onDataChanged(DataSnapshot dataSnapshot, GeoLocation location) {
+
+                }
+
+                @Override
+                public void onGeoQueryReady() {
+                }
+
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+
+                }
+            });
+
+        } catch (Exception e) {
+            Log.d("Error: ", e.toString());
+        }
     }
 
 }
